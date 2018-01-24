@@ -9,12 +9,14 @@ import hashlib
 from Crypto.Cipher import AES
 from Crypto import Random
 
+import cli
 
-def load_env(dotenv_path, password='', keyfile=''):
-    dotenv.load_dotenv(dotenv_path)
+
+def load_env(env_path, password='', keyfile=''):
+    dotenv.load_dotenv(env_path)
 
     enc_key = get_key(password, keyfile)
-    values = dotenv.main.dotenv_values(dotenv_path)
+    values = dotenv.main.dotenv_values(env_path)
     for key in values.keys():
         enc_value = os.environ[key]
         dec_value = decrypt_string(enc_value, enc_key)
@@ -22,38 +24,42 @@ def load_env(dotenv_path, password='', keyfile=''):
     return
 
 
-def update_env(dotenv_path, key, value, password='', keyfile=''):
+def update_env(env_path, key='', value='', password='', keyfile=''):
+    if key is None or value is None:
+        raise ValueError("You must specify a key and a value"
+                         " to update the env file.")
+
     enc_key = get_key(password, keyfile)
     enc_value = encrypt_string(value, enc_key)
-    dotenv.set_key(dotenv_path, key, enc_value)
+    dotenv.set_key(env_path, key, enc_value)
     return
 
 
-def list_env(dotenv_path, password='', keyfile=''):
+def list_env(env_path, password='', keyfile=''):
     enc_key = get_key(password, keyfile)
-    values = dotenv.main.dotenv_values(dotenv_path)
+    values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
         dec_value = decrypt_string(value, enc_key)
         print('%s="%s"' % (key, dec_value))
 
 
-def encrypt_env(dotenv_path, password='', keyfile=''):
+def encrypt_env(env_path, password='', keyfile=''):
     enc_key = get_key(password, keyfile)
 
-    values = dotenv.main.dotenv_values(dotenv_path)
+    values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
         enc_value = encrypt_string(value, enc_key)
-        dotenv.set_key(dotenv_path, key, enc_value)
+        dotenv.set_key(env_path, key, enc_value)
     return
 
 
-def decrypt_env(dotenv_path, password='', keyfile=''):
+def decrypt_env(env_path, password='', keyfile=''):
     enc_key = get_key(password, keyfile)
 
-    values = dotenv.main.dotenv_values(dotenv_path)
+    values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
         dec_value = decrypt_string(value, enc_key)
-        dotenv.set_key(dotenv_path, key, dec_value)
+        dotenv.set_key(env_path, key, dec_value)
     return
 
 
@@ -89,7 +95,3 @@ def decrypt_string(ciphertext, key):
 
     plaintext = aes.decrypt(ciphertext[AES.block_size:])
     return plaintext
-
-
-if __name__ == "__main__":
-    decrypt_env('../test.env', keyfile='/Users/aebaker/.ssh/id_rsa')
