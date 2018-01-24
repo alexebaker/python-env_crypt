@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import argparse
 
 import main
@@ -65,3 +68,13 @@ def parse_args():
 
     load_parser.set_defaults(func=main.load_env)
     return parser.parse_args()
+
+
+def run():
+    """Parses cli arguments and runs the requested functions."""
+    args = parse_args()
+    kwargs = {}
+    kwargs.update(vars(args))
+    kwargs.pop('func')
+    args.func(**kwargs)
+    return

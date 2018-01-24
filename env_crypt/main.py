@@ -9,8 +9,6 @@ import hashlib
 from Crypto.Cipher import AES
 from Crypto import Random
 
-import cli
-
 
 def load_env(env_path, password='', keyfile=''):
     dotenv.load_dotenv(env_path)
