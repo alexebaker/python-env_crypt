@@ -29,13 +29,13 @@ def parse_args():
         'encrypt',
         help='Encrypt an env file in place.')
 
-    enc_parser.set_defualts(func=main.encrypt_env)
+    enc_parser.set_defaults(func=main.encrypt_env)
 
     dec_parser = subparser.add_parser(
         'decrypt',
         help='Decrypt an env file in place.')
 
-    dec_parser.set_defualts(func=main.decrypt_env)
+    dec_parser.set_defaults(func=main.decrypt_env)
 
     update_parser = subparser.add_parser(
         'update',
@@ -51,17 +51,17 @@ def parse_args():
         type=str,
         help='Value to set the key to.')
 
-    update_env.set_defualts(func=main.update_env)
+    update_parser.set_defaults(func=main.update_env)
 
     list_parser = subparser.add_parser(
         'list',
         help='List the current encrypted env values.')
 
-    list_parser.set_defualts(func=main.list_env)
+    list_parser.set_defaults(func=main.list_env)
 
     load_parser = subparser.add_parser(
         'load',
         help='Load an encrypted env file into the current environment.')
 
-    load_parser.set_defualts(func=main.load_env)
+    load_parser.set_defaults(func=main.load_env)
     return parser.parse_args()
