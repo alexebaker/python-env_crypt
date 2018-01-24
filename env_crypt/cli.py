@@ -1,14 +1,17 @@
 from __future__ import unicode_literals
 from __future__ import print_function
+from __future__ import absolute_import
 
 import argparse
 
-import main
+from . import main
+from . import version
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Tool for encrypting and decrypting environment variables.')
+        version=version.__version__,
+        description='Tool for encrypting/decrypting environment variables.')
 
     parser.add_argument(
         '--env-path', '-e',
