@@ -1,3 +1,12 @@
+  ______  _   _ __      __   _____                      _
+ |  ____|| \ | |\ \    / /  / ____|                    | |
+ | |__   |  \| | \ \  / /  | |      _ __  _   _  _ __  | |
+ |  __|  | . ` |  \ \/ /   | |     | '__|| | | || '_ \ | __|
+ | |____ | |\  |   \  /    | |____ | |   | |_| || |_) || |
+ |______||_| \_|    \/      \_____||_|    \__, || .__/  \__|
+                                           __/ || |
+                                          |___/ |_|
+
 # ENV Crypt
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/alexebaker/python-env_crypt/blob/master/LICENSE)
