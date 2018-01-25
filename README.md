@@ -18,7 +18,7 @@ python setup.py install
 ## Usage
 
 After running the setup.py script, a cli tool called `env-crypt` is
-installed. This tool can be used for:
+installed. This tool can be used to:
 
 Encrypt the .env file with a password:
 
