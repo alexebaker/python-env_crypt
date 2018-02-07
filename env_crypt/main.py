@@ -6,6 +6,7 @@ import os
 import dotenv
 import base64
 import hashlib
+import subprocess
 
 from Crypto.Cipher import AES
 from Crypto import Random
@@ -17,9 +18,10 @@ def load_env(env_path, password='', keyfile=''):
     enc_key = get_key(password, keyfile)
     values = dotenv.main.dotenv_values(env_path)
     for key in values.keys():
-        enc_value = os.environ[key]
-        dec_value = decrypt_string(enc_value, enc_key)
-        os.environ[key] = dec_value
+        if key != 'salt':
+            enc_value = os.environ[key]
+            dec_value = decrypt_string(enc_value, enc_key)
+            os.environ[key] = dec_value
     return
 
 
@@ -38,31 +40,39 @@ def list_env(env_path, password='', keyfile=''):
     enc_key = get_key(password, keyfile)
     values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
-        dec_value = decrypt_string(value, enc_key)
+        if key != 'salt':
+            dec_value = decrypt_string(value, enc_key)
+        else:
+            dec_value = value
         print('%s="%s"' % (key, dec_value))
+    return
 
 
 def encrypt_env(env_path, password='', keyfile=''):
-    enc_key = get_key(password, keyfile)
+    enc_key, salt = get_key(password, keyfile)
+    dotenv.set_key(env_path, 'salt', salt)
 
     values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
-        enc_value = encrypt_string(value, enc_key)
-        dotenv.set_key(env_path, key, enc_value)
+        if key != 'salt':
+            enc_value = encrypt_string(value, enc_key)
+            dotenv.set_key(env_path, key, enc_value)
     return
 
 
 def decrypt_env(env_path, password='', keyfile=''):
-    enc_key = get_key(password, keyfile)
+    salt = dotenv.get_key(env_path, 'salt')
+    enc_key = get_key(password, keyfile, salt=salt)
 
     values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
-        dec_value = decrypt_string(value, enc_key)
-        dotenv.set_key(env_path, key, dec_value)
+        if key != 'salt':
+            dec_value = decrypt_string(value, enc_key)
+            dotenv.set_key(env_path, key, dec_value)
     return
 
 
-def get_key(password, keyfile):
+def get_key(password, keyfile, salt=None):
     if password is not None:
         key = password
     elif keyfile is not None:
@@ -74,9 +84,11 @@ def get_key(password, keyfile):
     if key > 1024:
         key = key[:1024]
 
-    salt = 'Er8iVILpk7CIoJU+C+N+ze+7/gAHfi9zHaT6vIzD6hk='
-    enc_key = hashlib.pbkdf2_hmac('sha256', key, salt, 1000000)
-    return enc_key
+    if salt is None:
+        salt = Random.new().read(256)
+
+    enc_key = hashlib.pbkdf2_hmac('sha256', key, salt, 100000)
+    return enc_key, salt
 
 
 def encrypt_string(plaintext, key):

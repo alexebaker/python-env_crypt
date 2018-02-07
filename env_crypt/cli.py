@@ -64,12 +64,6 @@ def parse_args():
         help='List the current encrypted env values.')
 
     list_parser.set_defaults(func=main.list_env)
-
-    load_parser = subparser.add_parser(
-        'load',
-        help='Load an encrypted env file into the current environment.')
-
-    load_parser.set_defaults(func=main.load_env)
     return parser.parse_args()
 
 
