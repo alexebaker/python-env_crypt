@@ -82,3 +82,8 @@ os.environ[key]
 ## Author
 
 [Alexander Baker](mailto:alexebaker@gmail.com)
+
+
+## Contributors
+
+[l50](https://github.com/l50)
