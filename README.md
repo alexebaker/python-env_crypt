@@ -23,45 +23,39 @@ installed. This tool can be used to:
 Encrypt the .env file with a password:
 
 ```bash
->>> env-crypt --env-path $PATH_TO_DOTENV --password $YOUR_PASSWORD
->>> encrypt
+>>> env-crypt --env-path $PATH_TO_DOTENV --password $YOUR_PASSWORD encrypt
 ```
 
 Decrypt the .env file with a password:
 
 ```bash
->>> env-crypt --env-path $PATH_TO_DOTENV --password $YOUR_PASSWORD
->>> decrypt
+>>> env-crypt --env-path $PATH_TO_DOTENV --password $YOUR_PASSWORD decrypt
 ```
 
 Encrypt the .env file with a keyfile:
 
 ```bash
->>> env-crypt --env-path $PATH_TO_DOTENV --keyfile $PATH_TO_SECRET_FILE
->>> encrypt
+>>> env-crypt --env-path $PATH_TO_DOTENV --keyfile $PATH_TO_SECRET_FILE encrypt
 ```
 
 Decrypt the .env file with a keyfile:
 
 ```bash
->>> env-crypt --env-path $PATH_TO_DOTENV --keyfile $PATH_TO_SECRET_FILE
->>> decrypt
+>>> env-crypt --env-path $PATH_TO_DOTENV --keyfile $PATH_TO_SECRET_FILE decrypt
 ```
 
 You can update the value of an encrypted .env key without having to
 decrypt it first:
 
 ```bash
->>> env-crypt --env-path $PATH_TO_DOTENV --password $YOUR_PASSWORD
->>> update --key $KEY_TO_UPDATE --value $NEW_VALUE
+>>> env-crypt --env-path $PATH_TO_DOTENV --password $YOUR_PASSWORD update --key $KEY_TO_UPDATE --value $NEW_VALUE
 ```
 
 You can see what the current values in the .env file are without having
 to decrypt and re-encrypt the files
 
 ```bash
->>> env-crypt --env-path $PATH_TO_DOTENV --keyfile $PATH_TO_SECRET_FILE
->>> list
+>>> env-crypt --env-path $PATH_TO_DOTENV --keyfile $PATH_TO_SECRET_FILE list
 ```
 
 Once you have encrypted your env file, you can load it into the python
@@ -81,7 +75,7 @@ os.environ[key]
 
 ## Author
 
-[Alexander Baker](mailto:alexebaker@gmail.com)
+[Alexander Baker](https://github.com/alexebaker)
 
 
 ## Contributors
