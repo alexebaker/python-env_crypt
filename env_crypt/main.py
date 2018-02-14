@@ -26,14 +26,12 @@ def load_env(env_path, password='', keyfile=''):
         >>> print(os.environ['env key'])
     """
     dotenv.load_dotenv(env_path)
-
-    enc_key = get_enc_key(password, keyfile)
+    salt = dotenv.get_key(env_path, 'salt')
+    enc_key, _ = get_enc_key(password, keyfile, salt=salt)
     values = dotenv.main.dotenv_values(env_path)
     for key in values.keys():
         if key != 'salt':
-            enc_value = os.environ[key]
-            dec_value = decrypt_string(enc_value, enc_key)
-            os.environ[key] = dec_value
+            os.environ[key] = decrypt_string(os.environ[key], enc_key)
     return
 
 
@@ -58,8 +56,8 @@ def update_env(env_path, key='', value='', password='', keyfile=''):
         raise ValueError("You must specify a key and a value"
                          " to update the env file.")
 
-    salt = dotenv.get_enc_key(env_path, 'salt')
-    enc_key = get_enc_key(password, keyfile, salt=salt)
+    salt = dotenv.get_key(env_path, 'salt')
+    enc_key, _ = get_enc_key(password, keyfile, salt=salt)
     enc_value = encrypt_string(value, enc_key)
     dotenv.set_key(env_path, key, enc_value)
     return
@@ -81,7 +79,8 @@ def list_env(env_path, password='', keyfile=''):
         key2=value2
         etc...
     """
-    enc_key = get_enc_key(password, keyfile)
+    salt = dotenv.get_key(env_path, 'salt')
+    enc_key, _ = get_enc_key(password, keyfile, salt=salt)
     values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
         if key != 'salt':
@@ -106,13 +105,12 @@ def encrypt_env(env_path, password='', keyfile=''):
         >>> encrypt_env('test.env', password='secret password')
     """
     enc_key, salt = get_enc_key(password, keyfile)
-    dotenv.set_key(env_path, 'salt', salt)
 
     values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
-        if key != 'salt':
-            enc_value = encrypt_string(value, enc_key)
-            dotenv.set_key(env_path, key, enc_value)
+        enc_value = encrypt_string(value, enc_key)
+        dotenv.set_key(env_path, key, enc_value)
+    dotenv.set_key(env_path, 'salt', salt)
     return
 
 
@@ -129,14 +127,14 @@ def decrypt_env(env_path, password='', keyfile=''):
         >>> from env_crypt import decrypt_env
         >>> decrypt_env('test.env', password='secret password')
     """
-    salt = dotenv.get_enc_key(env_path, 'salt')
-    enc_key = get_enc_key(password, keyfile, salt=salt)
+    salt = dotenv.get_key(env_path, 'salt')
+    dotenv.unset_key(env_path, 'salt')
+    enc_key, _ = get_enc_key(password, keyfile, salt=salt)
 
     values = dotenv.main.dotenv_values(env_path)
     for key, value in values.items():
-        if key != 'salt':
-            dec_value = decrypt_string(value, enc_key)
-            dotenv.set_key(env_path, key, dec_value)
+        dec_value = decrypt_string(value, enc_key)
+        dotenv.set_key(env_path, key, dec_value)
     return
 
 
@@ -161,10 +159,10 @@ def get_enc_key(password, keyfile, salt=None):
         >>> get_enc_key('secret password', None, salt='long and random')
         (enc_key, salt)
     """
-    if password is not None:
+    if password:
         key = password
-    elif keyfile is not None:
-        with open(keyfile, 'r') as f:
+    elif keyfile:
+        with open(os.path.expanduser(keyfile), 'rb') as f:
             key = f.read()
     else:
         raise ValueError("You must specify either a password or keyfile.")
@@ -174,9 +172,11 @@ def get_enc_key(password, keyfile, salt=None):
 
     if salt is None:
         salt = Random.new().read(256)
+    else:
+        salt = base64.b64decode(salt)
 
     enc_key = hashlib.pbkdf2_hmac('sha256', key, salt, 100000)
-    return enc_key, salt
+    return enc_key, base64.b64encode(salt)
 
 
 def encrypt_string(plaintext, key):
